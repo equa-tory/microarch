@@ -63,9 +63,14 @@ build_rows() {
         ROW_TEXT+=("$(basename "${disk}")  $(bytes_h "${size}")  ${pttype:-no partition table}$([[ ${is_boot} -eq 1 ]] && echo '  [boot medium]')")
         ROW_START+=(0); ROW_SIZE+=("${size}"); ROW_SELECTABLE+=(0)
 
-        if [[ "${pttype}" != "gpt" || ${is_boot} -eq 1 ]]; then
-            continue   # not GPT, or the disk we booted from: show only, skip layout
+        if [[ ${is_boot} -eq 1 ]]; then
+            continue   # the disk we booted from: show only, skip layout
         fi
+        if [[ -n "${pttype}" && "${pttype}" != "gpt" ]]; then
+            continue   # an existing non-GPT table (e.g. MBR): show only, don't touch
+        fi
+        # pttype is "gpt", or empty (a brand-new/blank disk) — lay it out.
+        # A blank disk gets a fresh GPT label at install time (see do_install).
 
         # existing partitions, sorted by start sector
         local sectsize secttotal
@@ -375,6 +380,13 @@ do_install() {
     partprobe "${disk}" 2>/dev/null || true
     udevadm settle
 
+    if [[ -z "$(blkid -o value -s PTTYPE "${disk}" 2>/dev/null)" ]]; then
+        echo "==> ${disk} has no partition table — creating a fresh GPT label..."
+        printf 'label: gpt\n' | sfdisk "${disk}"
+        partprobe "${disk}" 2>/dev/null || true
+        udevadm settle
+    fi
+
     echo "==> Creating ESP + root partition in the free space..."
     local esp_sectors=$(( ESP_SIZE_MIB * 1024 * 1024 / sectsize ))
     local esp_start=${start}
@@ -444,7 +456,7 @@ timeout: 0
     protocol: linux
     path: boot():/vmlinuz-linux-lts
     module_path: boot():/initramfs-linux-lts.img
-    cmdline: root=PARTUUID=${root_uuid} rw console=tty0 console=ttyS0,115200n8
+    cmdline: root=PARTUUID=${root_uuid} rw console=tty0 console=ttyS0,115200n8 quiet
 EOF2
 
     if [[ -n "${rootpass}" ]]; then

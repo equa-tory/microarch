@@ -1,7 +1,9 @@
 [Unit]
 Description=Refresh authorized_keys and dotfiles from GitHub (best-effort)
-After=network-online.target
-Wants=network-online.target
+# Deliberately After=network.target, not network-online.target: this must
+# never make boot wait for DHCP. The script has its own short timeouts and
+# just keeps the existing copies if there's no network yet.
+After=network.target
 
 [Service]
 Type=oneshot
