@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh authorized_keys and dotfiles from GitHub (best-effort)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/microarch-sync
+
+[Install]
+WantedBy=multi-user.target

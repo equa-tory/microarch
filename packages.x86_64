@@ -1,0 +1,40 @@
+# base
+base
+linux-lts
+mkinitcpio
+mkinitcpio-archiso
+syslinux
+
+# firmware (split packages; uncomment more as needed)
+linux-firmware-intel
+linux-firmware-realtek
+#linux-firmware-amdgpu
+#linux-firmware-atheros
+#linux-firmware-broadcom
+
+# networking
+openssh
+iwd
+ufw
+curl
+wget
+
+# tools
+git
+github-cli
+python
+fastfetch
+screen
+htop
+tar
+zoxide
+fd
+ripgrep
+neovim
+
+# install.sh dependencies (limine: installed system's bootloader; the live
+# ISO itself keeps systemd-boot, mkarchiso has no Limine boot mode)
+arch-install-scripts
+dosfstools
+e2fsprogs
+limine

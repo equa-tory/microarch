@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Best-effort refresh of root's authorized_keys and dotfiles from GitHub.
+# Never fails the boot: every step is independent and has a timeout.
+set -u
+
+GH_USER="equa-tory"
+SSH_DIR="/root/.ssh"
+AUTH_KEYS="${SSH_DIR}/authorized_keys"
+DOTFILES_DIR="/root/.config/dotfiles"
+DOTFILES_REPO="https://github.com/${GH_USER}/dotfiles.git"
+
+install -d -m 700 "${SSH_DIR}"
+install -d -m 755 "$(dirname "${DOTFILES_DIR}")"
+
+# --- authorized_keys -------------------------------------------------------
+tmp_keys="$(mktemp)"
+if curl -fsS --max-time 10 "https://github.com/${GH_USER}.keys" -o "${tmp_keys}" \
+    && grep -q '^ssh-' "${tmp_keys}" \
+    && ! grep -qv '^ssh-\|^$' "${tmp_keys}"; then
+    install -m 600 "${tmp_keys}" "${AUTH_KEYS}"
+    echo "microarch-sync: authorized_keys updated"
+else
+    echo "microarch-sync: no network or bad response, keeping existing authorized_keys"
+fi
+rm -f "${tmp_keys}"
+
+# --- dotfiles / shellrc -----------------------------------------------------
+if [[ -d "${DOTFILES_DIR}/.git" ]]; then
+    timeout 15 git -C "${DOTFILES_DIR}" pull --ff-only --quiet \
+        && echo "microarch-sync: dotfiles updated" \
+        || echo "microarch-sync: dotfiles pull failed, keeping existing copy"
+else
+    timeout 15 git clone --quiet --depth 1 "${DOTFILES_REPO}" "${DOTFILES_DIR}" \
+        && echo "microarch-sync: dotfiles cloned" \
+        || echo "microarch-sync: no network, dotfiles not available yet"
+fi
+
+exit 0

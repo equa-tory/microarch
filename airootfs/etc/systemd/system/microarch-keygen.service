@@ -1,0 +1,12 @@
+[Unit]
+Description=Generate root's ed25519 SSH keypair (once)
+ConditionPathExists=!/root/.ssh/id_ed25519
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/install -d -m 700 /root/.ssh
+ExecStart=/usr/bin/ssh-keygen -t ed25519 -N "" -f /root/.ssh/id_ed25519
+
+[Install]
+WantedBy=multi-user.target

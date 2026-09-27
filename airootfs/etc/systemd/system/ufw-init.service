@@ -1,0 +1,19 @@
+[Unit]
+Description=One-time ufw rule setup (deny incoming, allow outgoing, allow 22/tcp)
+DefaultDependencies=no
+Before=ufw.service
+After=local-fs.target
+ConditionPathExists=!/etc/ufw/.microarch-initialized
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ufw --force reset
+ExecStart=/usr/bin/ufw default deny incoming
+ExecStart=/usr/bin/ufw default allow outgoing
+ExecStart=/usr/bin/ufw allow 22/tcp
+ExecStart=/usr/bin/ufw --force enable
+ExecStart=/usr/bin/touch /etc/ufw/.microarch-initialized
+
+[Install]
+WantedBy=multi-user.target

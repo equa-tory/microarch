@@ -1,0 +1,104 @@
+# microarch: frpc client config, ships disabled (frpc.service is not enabled).
+# All [[proxies]] below are commented out for safety.
+# Start it with: systemctl enable --now frpc
+
+# FRP Client Configuration
+
+serverAddr = "equatory.ddns.net"
+serverPort = 10801
+
+# Authentication (must match server)
+auth.token = "karamba_trophey"
+
+# MINECRAFT TCP LAG FIX
+transport.protocol = "quic"
+transport.quic.keepalivePeriod = 10
+transport.quic.maxIdleTimeout = 30
+transport.quic.maxIncomingStreams = 100000
+
+# Optional logging
+log.level = "info"
+
+# -------------------------
+# SSH tunnel
+# -------------------------
+#[[proxies]]
+#name = "ssh"
+#type = "tcp"
+#localIP = "192.168.1.50"
+#localPort = 22
+#remotePort = 8080
+
+# -------------------------
+# Screener
+# -------------------------
+#[[proxies]]
+#name = "screener"
+#type = "tcp"
+#localIP = "192.168.1.176"
+#localPort = 8080
+#remotePort = 8048
+
+# -------------------------
+# Uptime-Kuma
+# -------------------------
+#[[proxies]]
+#name = "kuma"
+#type = "tcp"
+#localIP = "192.168.1.50"
+#localPort = 8881
+#remotePort = 3001
+
+# -------------------------
+# SMB
+# -------------------------
+#[[proxies]]
+#name = "smb"
+#type = "tcp"
+#localIP = "192.168.1.50"
+#localPort = 445
+#remotePort = 445
+
+# -------------------------
+# Minecraft Java
+# -------------------------
+#[[proxies]]
+#name = "minecraft"
+#type = "tcp"
+#localIP = "192.168.1.50"
+#localPort = 25565
+#remotePort = 25566
+
+# -------------------------
+# Minecraft Bedrock
+# -------------------------
+#[[proxies]]
+#name = "minecraft_bedrock"
+#type = "udp"
+#localIP = "192.168.1.50"
+#localPort = 19132
+#remotePort = 19132
+
+# -------------------------
+# TeamSpeak 3
+# -------------------------
+#[[proxies]]
+#name = "ts_voice"
+#type = "udp"
+#localIP = "127.0.0.1"
+#localPort = 9987
+#remotePort = 9987
+
+#[[proxies]]
+#name = "ts_tcp1"
+#type = "tcp"
+#localIP = "127.0.0.1"
+#localPort = 30033
+#remotePort = 30033
+
+#[[proxies]]
+#name = "ts_tcp2"
+#type = "tcp"
+#localIP = "127.0.0.1"
+#localPort = 10011
+#remotePort = 10011
